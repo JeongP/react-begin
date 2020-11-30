@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import Hello from './Hello';
@@ -6,9 +6,15 @@ import Wrapper from './Wrapper';
 import Counter from './Counter'
 import InputSample from './InpustSample';
 import UserList from './UserList';
-import CreateUser from './CreateUser'
+import CreateUser from './CreateUser';
+
+function countActiveUsers(users) {
+  console.log('활성 사용자 수 세는중..');
+  return users.filter(user => user.active).length;
+}
 
 function App() {
+
   // useState 사용
   const [inputs, setInputs] = useState({
     username: '',
@@ -29,17 +35,20 @@ function App() {
     {
       id: 1,
       username: 'velopert',
-      email: 'public.velopert@gmail.com'
+      email: 'public.velopert@gmail.com',
+      active: true
     },
     {
       id: 2,
       username: 'tester',
-      email: 'tester@example.com'
+      email: 'tester@example.com',
+      active: false
     },
     {
       id: 3,
       username: 'liz',
-      email: 'liz@example.com'
+      email: 'liz@example.com',
+      active: false
     }
   ]);
   
@@ -67,15 +76,27 @@ function App() {
     setUsers(users.filter(user => user.id !== id))
   }
 
+  // onToggle
+  const onToggle = id => {
+    setUsers(
+      users.map(user =>
+        user.id === id ? { ...user, active: !user.active } : user
+      )
+    );
+  };
+  
+  const count = useMemo(()=>countActiveUsers(users),[users]);
   return (
     <>
+      {/* <Counter/> */}
       <CreateUser 
         username={username}
         email={email}
         onChange={onChange}
         onCreate={onCreate}
       />
-      <UserList users={users} onRemove={onRemove}/>
+      <UserList users={users} onRemove={onRemove} onToggle={onToggle}/>
+      <div>활성사용자 수 : {count}</div>
     </>
   );
 }
